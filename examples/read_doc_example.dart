@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:boomsheets_dart/dart_boomsheets.dart';
+import 'package:boomsheets_dart/lib.dart';
 
 void main() async {
   Document doc = await DocumentReader.fromFile(
