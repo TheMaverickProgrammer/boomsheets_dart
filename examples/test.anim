@@ -1,0 +1,15 @@
+!frame_rate 60
+@screen_pos x = 100.000000, y=12.000000, abc
+@screen_pos x=12, y= 1, z    = 3
+animation state="OPEN"
+frame duration=2f x=0 y=129 w=235 h=2 originx=0 originy=0 flipx=0 flipy=0
+frame duration=2f x=0 y=102 w=236 h=27 originx=0 originy=14 flipx=0 flipy=0
+frame duration=2f x=0 y=59 w=236 h=43 originx=0 originy=22 flipx=0 flipy=0
+@screen_pos x=200 y=13
+frame duration=2f x=0 y=0 w=236 h=59 originx=0 originy=28 flipx=0 flipy=0
+
+animation state="CLOSE"
+frame duration=2f x=0 y=0 w=236 h=59 originx=0 originy=28 flipx=0 flipy=0
+frame duration=2f x=0 y=59 w=236 h=43 originx=0 originy=22 flipx=0 flipy=0
+frame duration=2f x=0 y=102 w=236 h=27 originx=0 originy=14 flipx=0 flipy=0
+frame duration=2f x=0 y=129 w=235 h=2 originx=0 originy=0 flipx=0 flipy=0
