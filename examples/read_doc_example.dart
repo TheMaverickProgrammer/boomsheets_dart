@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'package:dart_boomsheets/dart_boomsheets.dart';
+import 'package:boomsheets_dart/dart_boomsheets.dart';
 
 void main() async {
   Document doc = await DocumentReader.fromFile(
     File.fromUri(
-      Uri.parse("examples/basic/test.anim"),
+      Uri.parse("examples/test.anim"),
     ),
   );
 
