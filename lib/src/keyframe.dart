@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:boomsheets_dart/src/labeled_point.dart';
-import 'package:boomsheets_dart/src/frametime.dart';
+import 'package:boomsheets/src/labeled_point.dart';
+import 'package:boomsheets/src/frametime.dart';
 import 'package:yes_parser/yes_parser.dart';
 
 extension PointZero on Point<int> {

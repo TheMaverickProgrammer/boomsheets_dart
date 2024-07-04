@@ -1,5 +1,5 @@
-import 'package:boomsheets_dart/src/keyframe.dart';
-import 'package:boomsheets_dart/src/frametime.dart';
+import 'package:boomsheets/src/keyframe.dart';
+import 'package:boomsheets/src/frametime.dart';
 import 'package:yes_parser/yes_parser.dart';
 
 class Anim {

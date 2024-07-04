@@ -1,4 +1,4 @@
-import 'package:boomsheets_dart/src/anim.dart';
+import 'package:boomsheets/src/anim.dart';
 
 class Document {
   final Map<String, Anim> states = {};

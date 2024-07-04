@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:boomsheets_dart/src/anim.dart';
-import 'package:boomsheets_dart/src/document.dart';
-import 'package:boomsheets_dart/src/errors.dart';
-import 'package:boomsheets_dart/src/keyframe.dart';
-import 'package:boomsheets_dart/src/labeled_point.dart';
-import 'package:boomsheets_dart/src/frametime.dart';
+import 'package:boomsheets/src/anim.dart';
+import 'package:boomsheets/src/document.dart';
+import 'package:boomsheets/src/errors.dart';
+import 'package:boomsheets/src/keyframe.dart';
+import 'package:boomsheets/src/labeled_point.dart';
+import 'package:boomsheets/src/frametime.dart';
 import 'package:yes_parser/yes_parser.dart';
 
 /// [ParserErrorHandler] receives the errors and line numbers in [ErrorInfo].
