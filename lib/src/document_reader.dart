@@ -40,7 +40,7 @@ class DocumentReader {
       reader._handleErrors(onErrors);
     }
 
-    YesParser.fromString(body).onComplete(reader._process);
+    YesParser.fromString(body, onComplete: reader._process);
     return reader._doc;
   }
 
@@ -51,7 +51,7 @@ class DocumentReader {
       reader._handleErrors(onErrors);
     }
 
-    final p = YesParser.fromFile(file)..onComplete(reader._process);
+    final p = YesParser.fromFile(file, onComplete: reader._process);
     await p.join();
     return reader._doc;
   }

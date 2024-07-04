@@ -6,14 +6,14 @@ description:
   easy access and editing.
 repository: https://github.com/TheMaverickProgrammer/boomsheets_dart
 homepage: https://store.steampowered.com/app/2189000/BoomSheets/
-version: 1.0.0
+version: 1.0.1
 
 environment:
   sdk: ^3.3.4
 
 dependencies:
-  yes_parser: ^1.0.0
+  yes_parser: ^1.0.1
 
 dev_dependencies:
-  lints: ^3.0.0
+  lints: ^4.0.0
   test: ^1.24.0

@@ -4,10 +4,14 @@ import 'package:yes_parser/yes_parser.dart';
 
 class Anim {
   Frametime? _totalDuration;
-  List<Attribute> attrs = [];
-  List<Keyframe> keyframes = [];
+  List<Attribute> attrs;
+  List<Keyframe> keyframes;
   final String name;
-  Anim(this.name);
+
+  /// Creates state [Anim] called [name] with [keyframes] and [attributes].
+  Anim(this.name, {List<Keyframe>? keyframes, List<Attribute>? attributes})
+      : keyframes = keyframes ?? [],
+        attrs = attributes ?? [];
 
   Frametime get totalDuration {
     if (_totalDuration != null) return _totalDuration!;
