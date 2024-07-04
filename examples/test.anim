@@ -1,3 +1,6 @@
+# This document should match all the content printed in the read_doc_example.
+# However, line 15 and line 19 should report errors.
+
 !frame_rate 60
 @screen_pos x = 100.000000, y=12.000000, abc
 @screen_pos x=12, y= 1, z    = 3
@@ -9,7 +12,9 @@ frame duration=2f x=0 y=59 w=236 h=43 originx=0 originy=22 flipx=0 flipy=0
 frame duration=2f x=0 y=0 w=236 h=59 originx=0 originy=28 flipx=0 flipy=0
 
 animation state="CLOSE"
+this_keyword_doesnt_exist
 frame duration=2f x=0 y=0 w=236 h=59 originx=0 originy=28 flipx=0 flipy=0
 frame duration=2f x=0 y=59 w=236 h=43 originx=0 originy=22 flipx=0 flipy=0
 frame duration=2f x=0 y=102 w=236 h=27 originx=0 originy=14 flipx=0 flipy=0
+frame 
 frame duration=2f x=0 y=129 w=235 h=2 originx=0 originy=0 flipx=0 flipy=0
