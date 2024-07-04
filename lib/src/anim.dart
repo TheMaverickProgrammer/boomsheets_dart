@@ -4,7 +4,7 @@ import 'package:yes_parser/yes_parser.dart';
 
 class Anim {
   Frametime? _totalDuration;
-  List<Element> attrs = [];
+  List<Attribute> attrs = [];
   List<Keyframe> keyframes = [];
   final String name;
   Anim(this.name);

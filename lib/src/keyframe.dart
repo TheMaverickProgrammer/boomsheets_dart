@@ -8,14 +8,15 @@ extension PointZero on Point<int> {
 }
 
 class Keyframe {
-  List<Element> attrs = [];
+  List<Attribute> attrs = [];
   Rectangle<int> rect;
   Point<int> origin;
   List<LabeledPoint> points = [];
   bool flipX;
   bool flipY;
-  bool isEmpty;
   Frametime duration;
+
+  final bool isEmpty;
 
   Point<double> get canonicalOrigin {
     double w = 0;

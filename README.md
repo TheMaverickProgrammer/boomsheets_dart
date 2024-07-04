@@ -124,5 +124,5 @@ This project is licensed under the [Common Development and Distribution License 
 
 [BOOMFLAME]: ./
 [BOOMSHEETS_STEAM]: https://store.steampowered.com/app/2189000/BoomSheets/
-[LEGAL]: https://github.com/TheMaverickProgrammer/boomsheets_dart/blob/master/legal/README.md
-[YES_GIT]: https://github.com/TheMaverickProgrammer/js_yes_parser/blob/master/spec/README.md
+[LEGAL]: https://github.com/TheMaverickProgrammer/boomsheets_dart/blob/master/LICENSE
+[YES_GIT]: https://github.com/TheMaverickProgrammer/dart_yes_parser/blob/master/spec/README.md

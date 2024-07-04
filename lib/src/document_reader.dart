@@ -8,8 +8,24 @@ import 'package:boomsheets_dart/src/labeled_point.dart';
 import 'package:boomsheets_dart/src/frametime.dart';
 import 'package:yes_parser/yes_parser.dart';
 
+/// [ParserErrorHandler] receives the errors and line numbers in [ErrorInfo].
 typedef ParserErrorHandler = void Function(List<ErrorInfo> errors);
 
+/// [DocumentReader] reads boomsheets documents and parses them using the
+/// YES spec and generates [Keyframe], [Anim], and [Point] objects in the
+/// resultant [Document].
+///
+/// All of the parsing and value-checking are performed for you. As such
+/// those methods are private as well as the constructor for the reader.
+///
+/// In its place are two static public utility methods:
+/// 1. [DocumentReader.fromString] reads a string of the document's contents.
+/// The string expects the new-line characters to remain as line-terminators.
+///
+/// 2. [DocumentReader.fromFile] reads a [File] asynchronously.
+///
+/// Both methods return the final [Document]. To handle errors, pass in
+/// a [ParserErrorHandler] callback function in both utility methods.
 class DocumentReader {
   Document _doc = Document();
   String? _currAnim;
@@ -21,10 +37,10 @@ class DocumentReader {
   static Document fromString(String body, {ParserErrorHandler? onErrors}) {
     final DocumentReader reader = DocumentReader._();
     if (onErrors != null) {
-      reader.handleErrors(onErrors);
+      reader._handleErrors(onErrors);
     }
 
-    YesParser.fromString(body).then(reader.process);
+    YesParser.fromString(body).onComplete(reader._process);
     return reader._doc;
   }
 
@@ -32,22 +48,22 @@ class DocumentReader {
       {ParserErrorHandler? onErrors}) async {
     final DocumentReader reader = DocumentReader._();
     if (onErrors != null) {
-      reader.handleErrors(onErrors);
+      reader._handleErrors(onErrors);
     }
 
-    final p = YesParser.fromFile(file)..then(reader.process);
+    final p = YesParser.fromFile(file)..onComplete(reader._process);
     await p.join();
     return reader._doc;
   }
 
-  void handleErrors(final ParserErrorHandler onErrors) {
+  void _handleErrors(final ParserErrorHandler onErrors) {
     _errorHandler = onErrors;
   }
 
-  void process(List<Element> elements, List<ErrorInfo> errors) {
+  void _process(List<ElementInfo> elements, List<ErrorInfo> errors) {
     _doc = Document();
     for (final el in elements) {
-      switch (el.type) {
+      switch (el.element.type) {
         case ElementType.global:
           _processGlobal(el, errors);
           continue;
@@ -61,53 +77,80 @@ class DocumentReader {
     _errorHandler?.call(errors);
   }
 
-  void _processGlobal(Element el, List<ErrorInfo> errors) {
-    switch (el.text) {
+  void _processGlobal(ElementInfo info, List<ErrorInfo> errors) {
+    final String name = info.element.text;
+
+    if (info.element.args.isEmpty) {
+      errors.add(ErrorInfo.other(info.line, "$name expected a value"));
+      return;
+    }
+    switch (name) {
       case "frame_rate":
-        _doc.frameRate = int.tryParse(el.args[0].val) ?? 60;
+        _doc.frameRate = int.tryParse(info.element.args[0].val) ?? 60;
         break;
       case "image_path":
-        _doc.imagePath = el.args[0].val;
+        _doc.imagePath = info.element.args[0].val;
         break;
     }
   }
 
-  void _processStandard(Element el, List<ErrorInfo> errors) {
-    switch (el.text) {
+  void _processStandard(ElementInfo info, List<ErrorInfo> errors) {
+    final String keyword = info.element.text;
+    switch (keyword) {
       case "anim" || "animation":
-        _processAnim(el, errors);
+        _processAnim(info, errors);
         break;
       case "keyframe" || "frame":
-        _processKeyframe(el, errors);
+        _processKeyframe(info, errors);
         break;
       case "empty":
-        _processEmpty(el, errors);
+        _processEmpty(info, errors);
       case "point":
-        _processPoint(el, errors);
+        _processPoint(info, errors);
         break;
+      default:
+        errors.add(ErrorInfo.other(info.line, "Unexpected keyword $keyword"));
     }
   }
 
-  void _processAnim(Element el, List<ErrorInfo> errors) {
-    final String? state = el.getKeyValue("state", el.args[0].val);
-    if (state == null) {
-      errors.add(ErrorInfo.other(0, Errors.stateMissingLabel.message));
+  void _processAnim(ElementInfo info, List<ErrorInfo> errors) {
+    final Standard keyword = info.element as Standard;
+
+    if (keyword.args.isEmpty) {
+      errors.add(ErrorInfo.other(info.line, Errors.stateMissingLabel.message));
       return;
     }
 
-    _doc.states[state] = Anim(state)..attrs = el.attrs;
+    final String? state = keyword.getKeyValue("state", keyword.args[0].val);
+    if (state == null) {
+      errors.add(ErrorInfo.other(info.line, Errors.stateMissingLabel.message));
+      return;
+    }
+
+    _doc.states[state] = Anim(state)..attrs = keyword.attrs;
     _currAnim = state;
   }
 
-  void _processKeyframe(Element el, List<ErrorInfo> errors) {
+  void _processKeyframe(ElementInfo info, List<ErrorInfo> errors) {
+    final Standard keyword = info.element as Standard;
+
     if (_currAnim == null) {
-      errors.add(ErrorInfo.other(0, Errors.keyframeMissingAnimation.message));
+      errors.add(
+          ErrorInfo.other(info.line, Errors.keyframeMissingAnimation.message));
       return;
     }
 
-    String? dur = el.getKeyValue("duration", el.getKeyValue("dur"));
+    if (keyword.args.isEmpty) {
+      errors.add(ErrorInfo.other(info.line, Errors.malformedKeyframe.message));
+      return;
+    }
+
+    String? dur = keyword.getKeyValue(
+      "duration",
+      keyword.getKeyValue("dur", keyword.args[0].val),
+    );
     if (dur == null) {
-      errors.add(ErrorInfo.other(0, Errors.malformedEmpty.message));
+      errors.add(ErrorInfo.other(info.line, Errors.malformedEmpty.message));
       return;
     }
 
@@ -117,31 +160,40 @@ class DocumentReader {
 
     final duration = Frametime(int.tryParse(dur) ?? 0);
 
-    final Point<int> origin =
-        Point(el.getKeyValueAsInt("originx"), el.getKeyValueAsInt("originy"));
+    final Point<int> origin = Point(
+      keyword.getKeyValueAsInt("originx"),
+      keyword.getKeyValueAsInt("originy"),
+    );
     final Rectangle<int> rect = Rectangle(
-        el.getKeyValueAsInt("x"),
-        el.getKeyValueAsInt("y"),
-        el.getKeyValueAsInt("w"),
-        el.getKeyValueAsInt("h"));
+        keyword.getKeyValueAsInt("x"),
+        keyword.getKeyValueAsInt("y"),
+        keyword.getKeyValueAsInt("w"),
+        keyword.getKeyValueAsInt("h"));
 
     _currKeyframe = Keyframe(rect: rect, origin: origin, duration: duration)
-      ..flipX = el.getKeyValueAsBool("flipx")
-      ..flipY = el.getKeyValueAsBool("flipy")
-      ..attrs = el.attrs;
+      ..flipX = keyword.getKeyValueAsBool("flipx")
+      ..flipY = keyword.getKeyValueAsBool("flipy")
+      ..attrs = keyword.attrs;
 
     _doc.states[_currAnim!]?.keyframes.add(_currKeyframe!);
   }
 
-  void _processEmpty(Element el, List<ErrorInfo> errors) {
+  void _processEmpty(ElementInfo info, List<ErrorInfo> errors) {
     if (_currAnim == null) {
-      errors.add(ErrorInfo.other(0, Errors.keyframeMissingAnimation.message));
+      errors.add(
+          ErrorInfo.other(info.line, Errors.keyframeMissingAnimation.message));
       return;
     }
 
-    String? dur = el.getKeyValue("duration", el.getKeyValue("dur"));
+    final Standard empty = info.element as Standard;
+    if (empty.args.isEmpty) {
+      errors.add(ErrorInfo.other(info.line, Errors.malformedEmpty.message));
+      return;
+    }
+    String? dur = empty.getKeyValue(
+        "duration", empty.getKeyValue("dur", empty.args[0].val));
     if (dur == null) {
-      errors.add(ErrorInfo.other(0, Errors.malformedEmpty.message));
+      errors.add(ErrorInfo.other(info.line, Errors.malformedEmpty.message));
       return;
     }
 
@@ -153,8 +205,15 @@ class DocumentReader {
     _doc.states[_currAnim!]?.keyframes.add(Keyframe.empty(duration: duration));
   }
 
-  void _processPoint(Element el, List<ErrorInfo> errors) {
-    final String? label = el.getKeyValue("label", el.args[0].val);
+  void _processPoint(ElementInfo info, List<ErrorInfo> errors) {
+    final Standard point = info.element as Standard;
+
+    if (point.args.isEmpty) {
+      errors.add(ErrorInfo.other(0, Errors.pointMissingLabel.message));
+      return;
+    }
+
+    final String? label = point.getKeyValue("label", point.args[0].val);
     if (label == null) {
       errors.add(ErrorInfo.other(0, Errors.pointMissingLabel.message));
       return;
@@ -165,8 +224,14 @@ class DocumentReader {
       return;
     }
 
-    _currKeyframe!.points.add(LabeledPoint(
+    _currKeyframe!.points.add(
+      LabeledPoint(
         label: label,
-        pos: Point(el.getKeyValueAsInt("x"), el.getKeyValueAsInt("y"))));
+        pos: Point(
+          point.getKeyValueAsInt("x"),
+          point.getKeyValueAsInt("y"),
+        ),
+      ),
+    );
   }
 }
