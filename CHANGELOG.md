@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Bumped version to use YesParser 1.0.3
+
 ## 1.0.2
 
 - Bumped version to use YesParser 1.0.2
