@@ -10,16 +10,29 @@ void main() async {
     onErrors: printErrors,
   );
 
+  // Print every Anim state in the doc
   for (final MapEntry(:key, :value) in doc.states.entries) {
+    // Anim states can have attributes
     for (final attr in value.attrs) {
       print(attr);
     }
+
+    // Print the state name.
     print("state=$key");
+
+    // Followed by all the keyframes.
     for (final keyframe in value.keyframes) {
+      // Keyframes can have attributes.
       for (final attr in keyframe.attrs) {
         print(attr);
       }
+      // Print the key frame
       print(keyframe);
+
+      // Keyframes have zero or more point data
+      for (final iter in keyframe.points.entries) {
+        print(iter.value);
+      }
     }
   }
 }

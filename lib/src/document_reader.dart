@@ -11,27 +11,48 @@ import 'package:yes_parser/yes_parser.dart';
 /// [ParserErrorHandler] receives the errors and line numbers in [ErrorInfo].
 typedef ParserErrorHandler = void Function(List<ErrorInfo> errors);
 
-/// [DocumentReader] reads boomsheets documents and parses them using the
-/// YES spec and generates [Keyframe], [Anim], and [Point] objects in the
-/// resultant [Document].
+/// [DocumentReader] reads generated boomsheets anim docs and parses them.
 ///
-/// All of the parsing and value-checking are performed for you. As such
-/// those methods are private as well as the constructor for the reader.
+/// Each [Anim] represents a state and has a collection of [Keyframe]s. Their
+/// lines are identified by the keyword `anim`. Each line that follows can be
+/// a [Keyframe], identified by keyword `frame`, or the next anim state.
+/// A list of [Point]s are identified by the keyword `point` and end when the
+/// next `frame` keyword or `anim` keywords are reached. [Point]'s are optional
+/// but if one [Keyframe] has a [Point] label, then all [Keyframe]s in that
+/// state are expected to have an identically-named [Point] label. Otherwise
+/// the document is considered ill-formed with the official editor. Finally,
+/// there is a special [Keyframe] keyword `empty` that holds no size or origin
+/// data.
 ///
-/// In its place are two static public utility methods:
-/// 1. [DocumentReader.fromString] reads a string of the document's contents.
+/// An example doc might look like this:
+/// ```r
+/// anim punch
+/// frame dur=3f x=0 y=129 w=64 h=64 originx=0 originy=0
+/// frame dur=3f x=32 y=129 w=64 h=64 originx=0 originy=0
+/// frame dur=8f x=64 y=129 w=64 h=64 originx=0 originy=0
+///
+/// anim kick
+/// frame dur=8f x=128 y=500 w=120 h=66 originx=0 originy=0
+/// ... etc ...
+/// ```
+///
+///
+/// All of the parsing and value-checking are performed for you. As such,
+/// there are only two static public utility methods:
+/// 1. [DocumentReader.fromString] reads a [String] of the document's contents.
 /// The string expects the new-line characters to remain as line-terminators.
 ///
 /// 2. [DocumentReader.fromFile] reads a [File] asynchronously.
 ///
 /// Both methods return the final [Document]. To handle errors, pass in
-/// a [ParserErrorHandler] callback function in both utility methods.
+/// a [ParserErrorHandler] callback function.
 class DocumentReader {
   Document _doc = Document();
   String? _currAnim;
   Keyframe? _currKeyframe;
   ParserErrorHandler? _errorHandler;
 
+  // Private. Use the named constructors instead.
   DocumentReader._();
 
   static Document fromString(String body, {ParserErrorHandler? onErrors}) {
@@ -66,12 +87,10 @@ class DocumentReader {
       switch (el.element.type) {
         case ElementType.global:
           _processGlobal(el, errors);
-          continue;
         case ElementType.standard:
           _processStandard(el, errors);
-          continue;
         case _:
-        // fall-through
+          break; // do nothing
       }
     }
     _errorHandler?.call(errors);
@@ -103,7 +122,7 @@ class DocumentReader {
       case "keyframe" || "frame":
         _processKeyframe(info, errors);
         break;
-      case "empty":
+      case "empty" || "blank":
         _processEmpty(info, errors);
       case "point":
         _processPoint(info, errors);
@@ -224,13 +243,11 @@ class DocumentReader {
       return;
     }
 
-    _currKeyframe!.points.add(
-      LabeledPoint(
-        label: label,
-        pos: Point(
-          point.getKeyValueAsInt("x"),
-          point.getKeyValueAsInt("y"),
-        ),
+    _currKeyframe!.points[label] = LabeledPoint(
+      label: label,
+      pos: Point(
+        point.getKeyValueAsInt("x"),
+        point.getKeyValueAsInt("y"),
       ),
     );
   }

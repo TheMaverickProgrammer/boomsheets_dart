@@ -1,4 +1,4 @@
-/// Custom Boomsheets document [Errors]
+/// Custom Boomsheets document [Errors].
 enum Errors {
   pointMissingKeyframe('Missing parent Keyframe for Point.'),
   keyframeMissingAnimation('Missing parent Animation for Keyframe.'),
