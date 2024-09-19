@@ -183,11 +183,13 @@ class DocumentReader {
       keyword.getKeyValueAsInt("originx"),
       keyword.getKeyValueAsInt("originy"),
     );
-    final Rectangle<int> rect = Rectangle(
-        keyword.getKeyValueAsInt("x"),
-        keyword.getKeyValueAsInt("y"),
-        keyword.getKeyValueAsInt("w"),
-        keyword.getKeyValueAsInt("h"));
+
+    final KeyframeRect rect = (
+      pos: Point<int>(
+          keyword.getKeyValueAsInt("x"), keyword.getKeyValueAsInt("y")),
+      size: Point<int>(
+          keyword.getKeyValueAsInt("w"), keyword.getKeyValueAsInt("h")),
+    );
 
     _currKeyframe = Keyframe(rect: rect, origin: origin, duration: duration)
       ..flipX = keyword.getKeyValueAsBool("flipx")

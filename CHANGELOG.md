@@ -1,3 +1,10 @@
+## 1.0.4
+
+- Renamed `computeRect` and `computeOrigin` to `flippedRect` and `flippedOrigin`.
+- Rewrote `canonicalOrigin` from a getter to a method that takes in an optional `considerFlip`.
+- Added github-supported blockquotes to readme.
+- Bumped version to use YesParser 1.0.4
+
 ## 1.0.3
 
 - Bumped version to use YesParser 1.0.3

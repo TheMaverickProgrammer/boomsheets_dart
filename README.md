@@ -1,11 +1,11 @@
 # Boomsheets for Dart
 `Boomsheets` is a human-readable animation file format for all game developers.
 
-## Boomsheets + Flame engine!
-If you want to use your animation doc with the Flame engine, 
-it is recommended to use the package [Boomflame][BOOMFLAME] which
-uses this library and implements all the logic necessary to begin
-bringing your animations to life!
+> [!TIP]
+> If you want to use your animation doc with the flutter [Flame][FLAME] engine,
+> it is recommended to use the package [Boomflame][BOOMFLAME] which
+> uses this library and implements all the logic necessary to begin
+> bringing your animations to life!
 
 ## What Boomsheets Solves
 Most programmers use multiple images to represent individual frames.
@@ -19,8 +19,11 @@ space.
 [Boomsheets Editor][BOOMSHEETS_STEAM] solves these pain points by **empowering**
 game devs to select the slices in the spritesheet and reposition frames using
 offsets embedded into the document. Visit the [Steam page][BOOMSHEETS_STEAM]
-for more information. The generated document is available to use
-without the tool.
+for more information. 
+
+> [!NOTE]
+> The generated document is available to use without the tool.
+> Because of the spec's simplicity, they can even be created by hand!
 
 # Keywords
 Boomsheets uses the [YES scriptlet standard][YES_GIT] to define keywords
@@ -38,7 +41,12 @@ to the whole document.
 * `anim` - Represents an animation state and requires a string `state`.
 * `keyframe` - Represents one frame in the animation.
 * `point` - Represents a custom point in the frame.
-  * **NOTE**: Defining a point in a frame implicitly defines on in all frames for that animation.
+
+> [!NOTE] 
+> Defining a point in a frame implicitly defines a new point in all frames 
+> for the animation it resides in. So if you're generating your own documents,
+> be sure that each frame has the same number and names of points for 
+> that particular animation!
 
 ## Using your own custom meta data
 The underlining spec used to parse the boomsheets animation document allows
@@ -47,7 +55,8 @@ Metadata in the spec are called "Attributes" and begin with the `@` symbol
 and must come _before_ one of the animation keywords that they affect. 
 They also stack so that multiple attributes can be applied to an element!
 
-> **NOTE**: Attributes by themselves do not do anything! It is the coder's
+> [!IMPORTANT] 
+> Attributes by themselves do not do anything! It is the coder's
 > responsibility to read the attribute key-values and act on them.
 
 ### Metadata on animations
@@ -122,7 +131,8 @@ void main() async {
 # License
 This project is licensed under the [Common Development and Distribution License (CDDL)][LEGAL].
 
-[BOOMFLAME]: ./
+[BOOMFLAME]: https://github.com/TheMaverickProgrammer/boomflame
 [BOOMSHEETS_STEAM]: https://store.steampowered.com/app/2189000/BoomSheets/
+[FLAME]: https://flame-engine.org/
 [LEGAL]: https://github.com/TheMaverickProgrammer/boomsheets_dart/blob/master/LICENSE
 [YES_GIT]: https://github.com/TheMaverickProgrammer/dart_yes_parser/blob/master/spec/README.md
