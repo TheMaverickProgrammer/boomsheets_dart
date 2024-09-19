@@ -13,11 +13,11 @@ frame duration=2f x=0 y=0 w=236 h=59 originx=0 originy=28 flipx=0 flipy=0
 
 animation state="CLOSE"
 this_keyword_doesnt_exist
-frame duration=2f x=0 y=0 w=236 h=59 originx=0 originy=28 flipx=0 flipy=0
-frame duration=2f x=0 y=59 w=236 h=43 originx=0 originy=22 flipx=0 flipy=0
-frame duration=2f x=0 y=102 w=236 h=27 originx=0 originy=14 flipx=0 flipy=0
+frame duration=2f x=0 y=0 w=236 h=59 originx=0 originy=28 flipx=0 flipy=1
+frame duration=2f x=0 y=59 w=236 h=43 originx=0 originy=22 flipx=true flipy=2
+frame duration=2f x=0 y=102 w=236 h=27 originx=0 originy=14 flipx=false flipy=true
 frame 
-frame duration=2f x=0 y=129 w=235 h=2 originx=0 originy=0 flipx=0 flipy=0
+frame duration=2f x=0 y=129 w=235 h=2 originx=0 originy=0 flipx=www
 
 # Alternate between two frames with a point "cursor" to attach to
 animation BUTTON

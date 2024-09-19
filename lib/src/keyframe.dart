@@ -126,6 +126,6 @@ class Keyframe {
       return 'empty $duration';
     }
 
-    return 'keyframe={$duration\f, rect={$rect}, $origin, $flipX, $flipY}';
+    return 'keyframe={${duration}f, rect={$rect}, $origin, $flipX, $flipY}';
   }
 }
