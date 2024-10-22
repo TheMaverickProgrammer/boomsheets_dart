@@ -61,19 +61,22 @@ class DocumentReader {
       reader._handleErrors(onErrors);
     }
 
-    YesParser.fromString(body, onComplete: reader._process);
+    final YesParser yp = YesParser.fromString(body);
+    reader._process(yp.elementInfoList, yp.errorInfoList);
     return reader._doc;
   }
 
-  static Future<Document> fromFile(File file,
-      {ParserErrorHandler? onErrors}) async {
+  static Future<Document> fromFile(
+    File file, {
+    ParserErrorHandler? onErrors,
+  }) async {
     final DocumentReader reader = DocumentReader._();
     if (onErrors != null) {
       reader._handleErrors(onErrors);
     }
 
-    final p = YesParser.fromFile(file, onComplete: reader._process);
-    await p.join();
+    final YesParser yp = await YesParser.fromFile(file);
+    reader._process(yp.elementInfoList, yp.errorInfoList);
     return reader._doc;
   }
 
@@ -100,7 +103,7 @@ class DocumentReader {
     final String name = info.element.text;
 
     if (info.element.args.isEmpty) {
-      errors.add(ErrorInfo.other(info.line, "$name expected a value"));
+      errors.add(ErrorInfo.other(info.lineNumber, "$name expected a value"));
       return;
     }
     switch (name) {
@@ -128,7 +131,12 @@ class DocumentReader {
         _processPoint(info, errors);
         break;
       default:
-        errors.add(ErrorInfo.other(info.line, "Unexpected keyword $keyword"));
+        errors.add(
+          ErrorInfo.other(
+            info.lineNumber,
+            "Unexpected keyword $keyword",
+          ),
+        );
     }
   }
 
@@ -136,13 +144,23 @@ class DocumentReader {
     final Standard keyword = info.element as Standard;
 
     if (keyword.args.isEmpty) {
-      errors.add(ErrorInfo.other(info.line, Errors.stateMissingLabel.message));
+      errors.add(
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.stateMissingLabel.message,
+        ),
+      );
       return;
     }
 
     final String? state = keyword.getKeyValue("state", keyword.args[0].val);
     if (state == null) {
-      errors.add(ErrorInfo.other(info.line, Errors.stateMissingLabel.message));
+      errors.add(
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.stateMissingLabel.message,
+        ),
+      );
       return;
     }
 
@@ -155,12 +173,21 @@ class DocumentReader {
 
     if (_currAnim == null) {
       errors.add(
-          ErrorInfo.other(info.line, Errors.keyframeMissingAnimation.message));
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.keyframeMissingAnimation.message,
+        ),
+      );
       return;
     }
 
     if (keyword.args.isEmpty) {
-      errors.add(ErrorInfo.other(info.line, Errors.malformedKeyframe.message));
+      errors.add(
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.malformedKeyframe.message,
+        ),
+      );
       return;
     }
 
@@ -169,7 +196,12 @@ class DocumentReader {
       keyword.getKeyValue("dur", keyword.args[0].val),
     );
     if (dur == null) {
-      errors.add(ErrorInfo.other(info.line, Errors.malformedEmpty.message));
+      errors.add(
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.malformedEmpty.message,
+        ),
+      );
       return;
     }
 
@@ -202,19 +234,33 @@ class DocumentReader {
   void _processEmpty(ElementInfo info, List<ErrorInfo> errors) {
     if (_currAnim == null) {
       errors.add(
-          ErrorInfo.other(info.line, Errors.keyframeMissingAnimation.message));
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.keyframeMissingAnimation.message,
+        ),
+      );
       return;
     }
 
     final Standard empty = info.element as Standard;
     if (empty.args.isEmpty) {
-      errors.add(ErrorInfo.other(info.line, Errors.malformedEmpty.message));
+      errors.add(
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.malformedEmpty.message,
+        ),
+      );
       return;
     }
     String? dur = empty.getKeyValue(
         "duration", empty.getKeyValue("dur", empty.args[0].val));
     if (dur == null) {
-      errors.add(ErrorInfo.other(info.line, Errors.malformedEmpty.message));
+      errors.add(
+        ErrorInfo.other(
+          info.lineNumber,
+          Errors.malformedEmpty.message,
+        ),
+      );
       return;
     }
 
@@ -222,7 +268,7 @@ class DocumentReader {
       dur = dur.substring(0, dur.length - 1);
     }
 
-    final duration = Frametime(int.tryParse(dur) ?? 0);
+    final Frametime duration = Frametime(int.tryParse(dur) ?? 0);
     _doc.states[_currAnim!]?.keyframes.add(Keyframe.empty(duration: duration));
   }
 
@@ -230,18 +276,33 @@ class DocumentReader {
     final Standard point = info.element as Standard;
 
     if (point.args.isEmpty) {
-      errors.add(ErrorInfo.other(0, Errors.pointMissingLabel.message));
+      errors.add(
+        ErrorInfo.other(
+          0,
+          Errors.pointMissingLabel.message,
+        ),
+      );
       return;
     }
 
     final String? label = point.getKeyValue("label", point.args[0].val);
     if (label == null) {
-      errors.add(ErrorInfo.other(0, Errors.pointMissingLabel.message));
+      errors.add(
+        ErrorInfo.other(
+          0,
+          Errors.pointMissingLabel.message,
+        ),
+      );
       return;
     }
 
     if (_currKeyframe == null) {
-      errors.add(ErrorInfo.other(0, Errors.pointMissingKeyframe.message));
+      errors.add(
+        ErrorInfo.other(
+          0,
+          Errors.pointMissingKeyframe.message,
+        ),
+      );
       return;
     }
 

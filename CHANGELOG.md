@@ -1,3 +1,8 @@
+## 1.0.5
+
+- Fixed breaking changes from `yes_parser` upstream version `1.0.5`.
+- These changes improve parsing edge-case failures previously seen with animations.
+
 ## 1.0.4
 
 - Renamed `computeRect` and `computeOrigin` to `flippedRect` and `flippedOrigin`.
