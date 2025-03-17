@@ -19,7 +19,12 @@ frame duration=2f x=0 y=102 w=236 h=27 originx=0 originy=14 flipx=false flipy=tr
 frame 
 frame duration=2f x=0 y=129 w=235 h=2 originx=0 originy=0 flipx=www
 
-# Alternate between two frames with a point "cursor" to attach to
+# "Button" animation state alternates between two frames with a point
+# named "cursor" where a sprite can attach itself.
+# Update on 03/17/25: YesParser spec supports multi-line strings.
+@really_long_attr a=1,\
+                    b=2,\
+                    c=3
 animation BUTTON
 frame dur=4f x=64 y=0 w=64 h=64 originx=31 originy=31
 point label = cursor, x=31, y=31

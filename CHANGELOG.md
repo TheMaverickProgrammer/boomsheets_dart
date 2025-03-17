@@ -1,3 +1,8 @@
+## 1.0.6
+
+- Fixed pubspec description typo
+- Using YesParser 1.0.7
+
 ## 1.0.5
 
 - Fixed breaking changes from `yes_parser` upstream version `1.0.5`.
