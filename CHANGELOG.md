@@ -3,6 +3,7 @@
 - Fixed pubspec description typo
 - Using YesParser 1.0.8
 - Provided .anim doc example for multi-line elements
+- Improved readme
 
 ## 1.0.5
 
