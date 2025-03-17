@@ -1,7 +1,8 @@
 ## 1.0.6
 
 - Fixed pubspec description typo
-- Using YesParser 1.0.7
+- Using YesParser 1.0.8
+- Provided .anim doc example for multi-line elements
 
 ## 1.0.5
 
