@@ -1,3 +1,7 @@
+## 1.0.8
+
+- Bumped to `yes_parser` version `1.0.10` which fixes a major issue when parsing carriage returns and tabs in documents.
+
 ## 1.0.7
 
 - Bumped to `yes_parser` version `1.0.9`.
