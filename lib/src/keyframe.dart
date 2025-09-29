@@ -21,6 +21,10 @@ typedef KeyframeRect = ({Point<int> pos, Point<int> size});
 /// Therefore, arbitrary [points] with a name stored in [LabeledPoint.label]
 /// can be used to attach child nodes at specific locations relative to this
 /// frame.
+///
+/// See [Keyframe.pointOffset] to return a calculated [Point] with encoded
+/// offset with respect to [Keyframe.origin] of a matching [LabeledPoint].
+
 class Keyframe {
   static const Point<int> _pointZeroInt = Point(0, 0);
   static const Point<double> _pointZeroDouble = Point(0.0, 0.0);
@@ -57,11 +61,14 @@ class Keyframe {
     return (pos: Point<int>(x, y), size: Point<int>(w, h));
   }
 
-  Point<int> get flippedOrigin {
-    if (isEmpty) return _pointZeroInt;
-
-    int x = origin.x;
-    int y = origin.y;
+  /// Given a [point], returns a new [Point]
+  /// with respect to [Keyframe.flipX] and [Keyframe.flipY].
+  ///
+  /// If both booleans are false, that is there are no flips,
+  /// then the new [Point] is equal to exactly [point].
+  Point<int> flippedPoint(Point<int> point) {
+    int x = point.x;
+    int y = point.y;
 
     if (flipX) {
       x = rect.size.x - x;
@@ -72,6 +79,11 @@ class Keyframe {
     }
 
     return Point<int>(x, y);
+  }
+
+  Point<int> get flippedOrigin {
+    if (isEmpty) return _pointZeroInt;
+    return flippedPoint(origin);
   }
 
   /// If [considerFlip] is true, this method uses [flippedOrigin]
@@ -101,6 +113,23 @@ class Keyframe {
     }
 
     return Point<double>(w, h);
+  }
+
+  /// If the name [point] matches a [LabeledPoint] in this [Keyframe], then
+  /// return the calculated offset encoded in [Point] with respect to
+  /// [Keyframe.origin]. If no point is found, returns null.
+  ///
+  /// If [considerFlip] is true, this method uses [Keyframe.flippedPoint]
+  /// for calculating the destination point in the equation: `dest - origin`.
+  Point<int>? pointOffset({required String point, bool considerFlip = false}) {
+    if (!points.containsKey(point)) return null;
+
+    final Point<int> p = points[point]!.pos;
+    if (considerFlip) {
+      return flippedPoint(p) - flippedOrigin;
+    }
+
+    return p - origin;
   }
 
   /// Construct a rectangular keyframe [rect] with a [duration] and [origin].

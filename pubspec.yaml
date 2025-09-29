@@ -12,7 +12,7 @@ environment:
   sdk: ^3.3.4
 
 dependencies:
-  yes_parser: ^1.0.5
+  yes_parser: ^1.0.9
 
 dev_dependencies:
   lints: ^4.0.0
