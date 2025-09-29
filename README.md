@@ -7,6 +7,20 @@
 > uses this library and implements all the logic necessary to begin
 > bringing your animations to life!
 
+- [Boomsheets for Dart](#boomsheets-for-dart)
+  - [What Boomsheets Solves](#what-boomsheets-solves)
+- [Keywords](#keywords)
+  - [Globals](#globals)
+  - [Animation keywords](#animation-keywords)
+  - [Using your own custom meta data](#using-your-own-custom-meta-data)
+    - [Metadata on animations](#metadata-on-animations)
+    - [Metadata on keyframes](#metadata-on-keyframes)
+    - [Metadata on points](#metadata-on-points)
+- [Getting Started](#getting-started)
+  - [Running the Example](#running-the-example)
+- [License](#license)
+
+
 ## What Boomsheets Solves
 Most programmers use multiple images to represent individual frames.
 This is neither optimal, work efficient, nor GPU-friendly. 
@@ -104,9 +118,9 @@ animation states, keyframe data, and points. They can be used right away.
 
 ```dart
 void main() async {
-  Document doc = await DocumentReader.fromFile(
+  final Document doc = await DocumentReader.fromFile(
     File.fromUri(
-      Uri.parse("examples/test.anim"),
+      Uri.parse("example/test.anim"),
     ),
   );
 
@@ -126,6 +140,42 @@ void main() async {
     }
   }
 }
+```
+
+## Running the Example
+Follow these instructions:
+
+```sh
+dart example/read_doc_example.dart
+```
+
+The output will:
+1. demonstrate correct error reporting
+2. print standard animation data
+3. print custom user attributes
+
+```java
+>>>> Error on line 15: Unexpected keyword this_keyword_doesnt_exist
+>>>> Error on line 19: Keyframe must have fields: dur x y w h originx originy.
+@screen_pos x=100.000000, y=12.000000, abc
+@screen_pos x=12, y=1, z=3
+state=OPEN
+keyframe={2f, rect={(pos: Point(0, 129), size: Point(235, 2))}, Point(0, 0), false, false}
+keyframe={2f, rect={(pos: Point(0, 102), size: Point(236, 27))}, Point(0, 14), false, false}
+keyframe={2f, rect={(pos: Point(0, 59), size: Point(236, 43))}, Point(0, 22), false, false}
+@screen_pos x=200, y=13
+keyframe={2f, rect={(pos: Point(0, 0), size: Point(236, 59))}, Point(0, 28), false, false}
+state=CLOSE
+keyframe={2f, rect={(pos: Point(0, 0), size: Point(236, 59))}, Point(0, 28), false, true}
+keyframe={2f, rect={(pos: Point(0, 59), size: Point(236, 43))}, Point(0, 22), true, true}
+keyframe={2f, rect={(pos: Point(0, 102), size: Point(236, 27))}, Point(0, 14), false, true}
+keyframe={2f, rect={(pos: Point(0, 129), size: Point(235, 2))}, Point(0, 0), false, false}
+@really_long_attr a=1, b=2, c=3
+state=BUTTON
+keyframe={4f, rect={(pos: Point(64, 0), size: Point(64, 64))}, Point(31, 31), false, false}
+point={cursor, x=31, y=31}
+keyframe={4f, rect={(pos: Point(64, 0), size: Point(64, 64))}, Point(31, 31), false, false}
+point={cursor, x=34, y=31}
 ```
 
 # License

@@ -3,7 +3,7 @@ import 'package:boomsheets/boomsheets.dart';
 import 'package:yes_parser/yes_parser.dart';
 
 void main() async {
-  Document doc = await DocumentReader.fromFile(
+  final Document doc = await DocumentReader.fromFile(
     File.fromUri(
       Uri.parse("example/test.anim"),
     ),

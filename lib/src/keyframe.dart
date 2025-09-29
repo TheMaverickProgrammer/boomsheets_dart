@@ -24,22 +24,42 @@ typedef KeyframeRect = ({Point<int> pos, Point<int> size});
 ///
 /// See [Keyframe.pointOffset] to return a calculated [Point] with encoded
 /// offset with respect to [Keyframe.origin] of a matching [LabeledPoint].
-
 class Keyframe {
   static const Point<int> _pointZeroInt = Point(0, 0);
   static const Point<double> _pointZeroDouble = Point(0.0, 0.0);
   static const KeyframeRect _rectZero =
       (pos: _pointZeroInt, size: _pointZeroInt);
 
+  /// List of user-defined [Attribute] elements tagged to this [Keyframe].
   List<Attribute> attrs = [];
+
+  /// Represents the position on the texture (x,y) where this
+  /// [Keyframe] begins. Combined with a width and height,
+  /// represents the visible cell of the sprite at some moment.
   KeyframeRect rect;
+
+  /// Represents the local point (0,0) on the source texture.
   Point<int> origin;
+
+  /// A map of [String] names to [LabeledPoint] points.
   Map<String, LabeledPoint> points = {};
+
+  /// Whether or not this frame is flipped horizontally.
   bool flipX;
+
+  /// Whether or not this frame is flipped vertically.
   bool flipY;
+
+  /// The duration of this [Keyframe] in [Frametime].
   Frametime duration;
+
+  /// Whether or not this [Keyframe] represents a blank frame.
+  /// This is useful for flickering effects or hiding a sprite.
   final bool isEmpty;
 
+  /// If this [Keyframe] represents an empty frame e.g. [Keyframe.isEmpty],
+  /// then returns [Keyframe._rectZero]. Otherwise, return
+  /// [KeyframeRect] with respect to [Keyframe.flipX] and [Keyframe.flipY].
   KeyframeRect get flippedRect {
     if (isEmpty) return _rectZero;
 
@@ -81,6 +101,9 @@ class Keyframe {
     return Point<int>(x, y);
   }
 
+  /// If this [Keyframe] represents an empty frame e.g. [Keyframe.isEmpty],
+  /// then returns [Keyframe._pointZeroInt]. Otherwise, return
+  /// [Keyframe.origin] with respect to [Keyframe.flipX] and [Keyframe.flipY].
   Point<int> get flippedOrigin {
     if (isEmpty) return _pointZeroInt;
     return flippedPoint(origin);
