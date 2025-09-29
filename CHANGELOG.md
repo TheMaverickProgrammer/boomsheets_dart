@@ -1,8 +1,16 @@
-## 1.0.6
+## 1.0.7
 
 - Bumped to `yes_parser` version `1.0.9`.
 - Added `Point<int> Keyframe.flippedPoint(Point<int> point)` to calculate arbitrary points.
 - Added `Point<int> Keyframe.pointOffset({required String point})` to calculate encoded point offsets from `Keyframe.origin`.
+- More documentation to `Keyframe` class.
+
+## 1.0.6
+
+- Fixed pubspec description typo
+- Using YesParser 1.0.8
+- Provided .anim doc example for multi-line elements
+- Improved readme
 
 ## 1.0.5
 
