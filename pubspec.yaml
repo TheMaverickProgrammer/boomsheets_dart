@@ -9,10 +9,10 @@ homepage: https://store.steampowered.com/app/2189000/BoomSheets/
 version: 1.0.7
 
 environment:
-  sdk: ^3.3.4
+  sdk: ^3.5.3
 
 dependencies:
   yes_parser: ^1.0.9
 
 dev_dependencies:
-  lints: ^5.1.1
+  lints: ^4.0.0
