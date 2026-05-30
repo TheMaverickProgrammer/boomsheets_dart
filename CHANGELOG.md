@@ -1,3 +1,6 @@
+## 1.0.11
+- Somehow bumped without the actual change. For real: `options` -> `xtends` from previous version.
+- 
 ## 1.0.10
 - Missed `options` -> `xtends` from previous version.
   

@@ -65,7 +65,7 @@ class DocumentReader {
   DocumentReader._() : xtends = [];
 
   /// Given a [body] of text and a list of YES spec
-  /// extensions [options], parse and return [Document].
+  /// extensions [xtends], parse and return [Document].
   ///
   /// If a custom [onErrors] implementation is provided,
   /// then errors will be fed to it.
@@ -74,7 +74,7 @@ class DocumentReader {
   static Document fromString(
     String body, {
     ParserErrorHandler? onErrors,
-    List<Extensions> options = const [],
+    List<Extensions> xtends = const [],
   }) {
     final DocumentReader reader = DocumentReader._();
     if (onErrors != null) {
@@ -83,7 +83,7 @@ class DocumentReader {
     String content = '';
     for (final s in body.split('\n')) {
       // XE 2026.1: Macros for repeating lines.
-      if (options.contains(Extensions.macro2026)) {
+      if (xtends.contains(Extensions.macro2026)) {
         content += reader._preprocessMacros(s);
         continue;
       }
@@ -91,7 +91,7 @@ class DocumentReader {
     }
 
     final YesParser yp = YesParser.fromString(content);
-    reader._process(yp.elementInfoList, yp.errorInfoList, options);
+    reader._process(yp.elementInfoList, yp.errorInfoList, xtends);
     return reader._doc;
   }
 
@@ -110,7 +110,7 @@ class DocumentReader {
     return fromString(
       await file.readAsString(),
       onErrors: onErrors,
-      options: xtends,
+      xtends: xtends,
     );
   }
 
