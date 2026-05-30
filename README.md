@@ -1,7 +1,6 @@
 # Boomsheets for Dart
 [![VS Code Download](https://img.shields.io/badge/VS%20Code%20Extension-Download-blue)](https://marketplace.visualstudio.com/items?itemName=ProtoComplete.boomsheets)
 
-
 `Boomsheets` is a human-readable animation file format for all game developers.
 
 > [!TIP]
@@ -21,6 +20,8 @@
     - [Metadata on points](#metadata-on-points)
 - [Getting Started](#getting-started)
   - [Running the Example](#running-the-example)
+- [Extensions](#extensions)
+  - [XE 2026.1: Macros](#xe-20261-macros)
 - [License](#license)
 
 
@@ -179,6 +180,29 @@ keyframe={4f, rect={(pos: Point(64, 0), size: Point(64, 64))}, Point(31, 31), fa
 point={cursor, x=31, y=31}
 keyframe={4f, rect={(pos: Point(64, 0), size: Point(64, 64))}, Point(31, 31), false, false}
 point={cursor, x=34, y=31}
+```
+
+# Extensions
+## XE 2026.1: Macros
+The underlying YES spec is simple, but there arises a need to repeat similar lines of metadata.
+For example: attributes. It becomes a chore to repeat the same `@geom` attribute for a
+high-fidelity fighting game, where each geometry entry is a common hitbox.
+
+Macros are introduced with a leading `+` symbol followed by a name and a line definition.
+
+```java
++bounds @geom bounds rect w=16 h=16 originx=8 originy=16
+```
+
+Enabling this extension adds an additional pre-processing step to the document constructor.
+Every line matching the only `+bounds` will be replaced by the entire contents of that macro.
+
+Macros support multiple lines denoted by a block of braces:
+
+```java
++bounds {
+  @geom bounds rect w=16 h=16 originx=8 originy=16
+}
 ```
 
 # License

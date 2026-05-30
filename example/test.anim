@@ -2,7 +2,10 @@
 # However, line 15 and line 19 should report errors.
 !frame_rate 60
 
-+bounds @geom bounds rect w=16 h=16 originx=8 originy=16
++bounds {
+    @geom bounds rect w=16 h=16 originx=8 originy=16
+    frame duration=123f x=123 y=123
+}
 
 @screen_pos x = 100.000000, y=12.000000, abc
 @screen_pos x=12, y= 1, z    = 3

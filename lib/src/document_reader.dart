@@ -130,7 +130,7 @@ class DocumentReader {
       }
 
       // Add the piece to the macro.
-      _macros[m] = def + line.trim();
+      _macros[m] = def + line.trim() + '\n';
 
       // This line belonged to a macro.
       // Do not include it in the doc parser output.
@@ -172,7 +172,7 @@ class DocumentReader {
 
             // Inject the macro's definition.
             if (_macros.containsKey(name)) {
-              return '${_macros[name]!}\n';
+              return _macros[name]!;
             }
           }
         }
