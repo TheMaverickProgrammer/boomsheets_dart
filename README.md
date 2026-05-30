@@ -1,4 +1,7 @@
 # Boomsheets for Dart
+[![VS Code Download](https://img.shields.io/badge/VS%20Code%20Extension-Download-blue)](https://marketplace.visualstudio.com/items?itemName=ProtoComplete.boomsheets)
+
+
 `Boomsheets` is a human-readable animation file format for all game developers.
 
 > [!TIP]

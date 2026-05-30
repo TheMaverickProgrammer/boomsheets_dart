@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:boomsheets/src/anim.dart';
@@ -36,7 +37,6 @@ typedef ParserErrorHandler = void Function(List<ErrorInfo> errors);
 /// ... etc ...
 /// ```
 ///
-///
 /// All of the parsing and value-checking are performed for you. As such,
 /// there are only two static public utility methods:
 /// 1. [DocumentReader.fromString] reads a [String] of the document's contents.
@@ -47,6 +47,8 @@ typedef ParserErrorHandler = void Function(List<ErrorInfo> errors);
 /// Both methods return the final [Document]. To handle errors, pass in
 /// a [ParserErrorHandler] callback function.
 class DocumentReader {
+  final Map<String, String> _macros = {};
+  String? _currMacro;
   Document _doc = Document();
   String? _currAnim;
   Keyframe? _currKeyframe;
@@ -75,9 +77,58 @@ class DocumentReader {
       reader._handleErrors(onErrors);
     }
 
-    final YesParser yp = await YesParser.fromFile(file);
+    String content = '';
+
+    await file
+        .openRead()
+        .transform(utf8.decoder)
+        .transform(LineSplitter())
+        .forEach((line) => content += reader._preprocessMacros(line))
+        .onError((err, _) => ());
+
+    final YesParser yp = YesParser.fromString(content);
     reader._process(yp.elementInfoList, yp.errorInfoList);
     return reader._doc;
+  }
+
+  String _preprocessMacros(String line) {
+    if (_currMacro != null) {
+      final String m = _currMacro!;
+      String def = _macros[m]!;
+
+      final int endIdx = line.lastIndexOf('}');
+      if (endIdx != -1) {
+        line = line.substring(0, endIdx);
+        _currMacro = null;
+      }
+
+      _macros[m] = def + line.trim();
+
+      return '';
+    }
+
+    line = line.trim();
+    if (line.startsWith(RegExp(r'>>>'))) {
+      // Pattern:
+      // >>> name {
+      //  ... content
+      // }
+      final int nameIdx = line.indexOf(RegExp(r'([a-zA-Z])'));
+      if (nameIdx != -1) {
+        final int defIdx = line.indexOf('{', nameIdx);
+        if (defIdx != -1) {
+          final String name = line.substring(nameIdx, defIdx).trim();
+          final String def = line.substring(defIdx + 1);
+          print('macro name: $name. Macro def=$def');
+          _currMacro = name;
+          _macros[name] = def;
+        }
+      }
+
+      return '';
+    }
+
+    return '$line\n';
   }
 
   void _handleErrors(final ParserErrorHandler onErrors) {
