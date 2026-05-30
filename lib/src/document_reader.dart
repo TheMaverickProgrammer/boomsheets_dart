@@ -130,7 +130,7 @@ class DocumentReader {
       }
 
       // Add the piece to the macro.
-      _macros[m] = def + line.trim() + '\n';
+      _macros[m] = '$def${line.trim()}\n';
 
       // This line belonged to a macro.
       // Do not include it in the doc parser output.
@@ -162,7 +162,7 @@ class DocumentReader {
             // This is a one-line macro and does not need to track
             // its building.
             final String name = line.substring(nameIdx, spaceIdx).trim();
-            final String def = line.substring(spaceIdx + 1);
+            final String def = '${line.substring(spaceIdx + 1)}\n';
             _macros[name] = def;
           } else {
             // This is not a macro definition. This is a macro
