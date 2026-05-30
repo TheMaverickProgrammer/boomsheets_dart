@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:boomsheets/src/anim.dart';
@@ -8,6 +7,13 @@ import 'package:boomsheets/src/keyframe.dart';
 import 'package:boomsheets/src/labeled_point.dart';
 import 'package:boomsheets/src/frametime.dart';
 import 'package:yes_parser/yes_parser.dart';
+
+/// Optional extensions to support while parsing the document.
+/// Extensions:
+/// - [macro2026] - Preprocesses the document for macros.
+enum Extensions {
+  macro2026,
+}
 
 /// [ParserErrorHandler] receives the errors and line numbers in [ErrorInfo].
 typedef ParserErrorHandler = void Function(List<ErrorInfo> errors);
@@ -48,6 +54,7 @@ typedef ParserErrorHandler = void Function(List<ErrorInfo> errors);
 /// a [ParserErrorHandler] callback function.
 class DocumentReader {
   final Map<String, String> _macros = {};
+  final List<Extensions> xtends;
   String? _currMacro;
   Document _doc = Document();
   String? _currAnim;
@@ -55,76 +62,123 @@ class DocumentReader {
   ParserErrorHandler? _errorHandler;
 
   // Private. Use the named constructors instead.
-  DocumentReader._();
+  DocumentReader._() : xtends = [];
 
-  static Document fromString(String body, {ParserErrorHandler? onErrors}) {
+  /// Given a [body] of text and a list of YES spec
+  /// extensions [options], parse and return [Document].
+  ///
+  /// If a custom [onErrors] implementation is provided,
+  /// then errors will be fed to it.
+  ///
+  /// By default, no extensions are selected.
+  static Document fromString(
+    String body, {
+    ParserErrorHandler? onErrors,
+    List<Extensions> options = const [],
+  }) {
     final DocumentReader reader = DocumentReader._();
     if (onErrors != null) {
       reader._handleErrors(onErrors);
     }
+    String content = '';
+    for (final s in body.split('\n')) {
+      // XE 2026.1: Macros for repeating lines.
+      if (options.contains(Extensions.macro2026)) {
+        content += reader._preprocessMacros(s);
+        continue;
+      }
+      content += '$s\n';
+    }
 
-    final YesParser yp = YesParser.fromString(body);
-    reader._process(yp.elementInfoList, yp.errorInfoList);
+    final YesParser yp = YesParser.fromString(content);
+    reader._process(yp.elementInfoList, yp.errorInfoList, options);
     return reader._doc;
   }
 
+  /// Given a [file] and list of YES spec extensions [xtends],
+  /// parse and return [Document].
+  ///
+  /// If a custom [onErrors] implementation is provided,
+  /// then errors will be fed to it.
+  ///
+  /// By default, no extensions are selected.
   static Future<Document> fromFile(
     File file, {
     ParserErrorHandler? onErrors,
+    List<Extensions> xtends = const [],
   }) async {
-    final DocumentReader reader = DocumentReader._();
-    if (onErrors != null) {
-      reader._handleErrors(onErrors);
-    }
-
-    String content = '';
-
-    await file
-        .openRead()
-        .transform(utf8.decoder)
-        .transform(LineSplitter())
-        .forEach((line) => content += reader._preprocessMacros(line))
-        .onError((err, _) => ());
-
-    final YesParser yp = YesParser.fromString(content);
-    reader._process(yp.elementInfoList, yp.errorInfoList);
-    return reader._doc;
+    return fromString(
+      await file.readAsString(),
+      onErrors: onErrors,
+      options: xtends,
+    );
   }
 
   String _preprocessMacros(String line) {
+    // We may be currently building a macro.
     if (_currMacro != null) {
       final String m = _currMacro!;
       String def = _macros[m]!;
 
+      // Look ahead for the terminating brace.
       final int endIdx = line.lastIndexOf('}');
       if (endIdx != -1) {
+        // Add up to the end-brace only.
         line = line.substring(0, endIdx);
+        // Signal end of macro building.
         _currMacro = null;
       }
 
+      // Add the piece to the macro.
       _macros[m] = def + line.trim();
 
+      // This line belonged to a macro.
+      // Do not include it in the doc parser output.
       return '';
     }
 
     line = line.trim();
-    if (line.startsWith(RegExp(r'>>>'))) {
+    if (line.startsWith('+')) {
       // Pattern:
-      // >>> name {
+      // + name {
       //  ... content
       // }
       final int nameIdx = line.indexOf(RegExp(r'([a-zA-Z])'));
       if (nameIdx != -1) {
+        // The curly braces determine if this is a macro definition
+        // or a macro injection.
         final int defIdx = line.indexOf('{', nameIdx);
         if (defIdx != -1) {
           final String name = line.substring(nameIdx, defIdx).trim();
           final String def = line.substring(defIdx + 1);
-          print('macro name: $name. Macro def=$def');
+          // We expect a terminating '}' to end the macro.
+          // So we keep track of what we are building.
           _currMacro = name;
           _macros[name] = def;
+        } else {
+          // This may be a one-line macro definition.
+          final int spaceIdx = line.indexOf(' ', nameIdx);
+          if (spaceIdx > -1) {
+            // This is a one-line macro and does not need to track
+            // its building.
+            final String name = line.substring(nameIdx, spaceIdx).trim();
+            final String def = line.substring(spaceIdx + 1);
+            _macros[name] = def;
+          } else {
+            // This is not a macro definition. This is a macro
+            // with which to inject its contents, if the macro
+            // was defined.
+            final String name = line.substring(nameIdx).trim();
+
+            // Inject the macro's definition.
+            if (_macros.containsKey(name)) {
+              return '${_macros[name]!}\n';
+            }
+          }
         }
       }
 
+      // No macros in the preprocess step for this line.
       return '';
     }
 
@@ -135,7 +189,11 @@ class DocumentReader {
     _errorHandler = onErrors;
   }
 
-  void _process(List<ElementInfo> elements, List<ErrorInfo> errors) {
+  void _process(
+    List<ElementInfo> elements,
+    List<ErrorInfo> errors,
+    List<Extensions> xtends,
+  ) {
     _doc = Document();
     for (final el in elements) {
       switch (el.element.type) {

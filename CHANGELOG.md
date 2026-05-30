@@ -1,5 +1,11 @@
-## 1.0.8
+## 1.0.9
+- VS Code Extension on the market place.
+- Extensions (XE) are optional opt-in constructor arguments.
+- Added experimental macro support: _XE 2026.1_.
+  - Macros are lines starting with `+` and a name.
+  - Macros are preprocessed before parsing the doc.
 
+## 1.0.8
 - Bumped to `yes_parser` version `1.0.10` which fixes a major issue when parsing carriage returns and tabs in documents.
 
 ## 1.0.7

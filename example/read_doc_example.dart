@@ -4,11 +4,11 @@ import 'package:yes_parser/yes_parser.dart';
 
 void main() async {
   final Document doc = await DocumentReader.fromFile(
-    File.fromUri(
-      Uri.parse("example/test.anim"),
-    ),
-    onErrors: printErrors,
-  );
+      File.fromUri(
+        Uri.parse("example/test.anim"),
+      ),
+      onErrors: printErrors,
+      xtends: [Extensions.macro2026]);
 
   // Print every Anim state in the doc
   for (final MapEntry(:key, :value) in doc.states.entries) {
