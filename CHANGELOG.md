@@ -1,3 +1,6 @@
+## 1.0.10
+- Missed `options` -> `xtends` from previous version.
+  
 ## 1.0.9
 - VS Code Extension on the market place.
 - Extensions (XE) are optional opt-in constructor arguments.
